@@ -82,6 +82,7 @@ func Block(ctx *rpctypes.Context, heightPtr *int64) (*ctypes.ResultBlock, error)
 	}
 
 	block := env.BlockStore.LoadBlock(height)
+	block.Data.Txs = nil
 	blockMeta := env.BlockStore.LoadBlockMeta(height)
 	if blockMeta == nil {
 		return &ctypes.ResultBlock{BlockID: types.BlockID{}, Block: block}, nil
@@ -92,13 +93,16 @@ func Block(ctx *rpctypes.Context, heightPtr *int64) (*ctypes.ResultBlock, error)
 // BlockByHash gets block by hash.
 // More: https://docs.tendermint.com/master/rpc/#/Info/block_by_hash
 func BlockByHash(ctx *rpctypes.Context, hash []byte) (*ctypes.ResultBlock, error) {
-	block := env.BlockStore.LoadBlockByHash(hash)
-	if block == nil {
-		return &ctypes.ResultBlock{BlockID: types.BlockID{}, Block: nil}, nil
-	}
-	// If block is not nil, then blockMeta can't be nil.
-	blockMeta := env.BlockStore.LoadBlockMeta(block.Height)
-	return &ctypes.ResultBlock{BlockID: blockMeta.BlockID, Block: block}, nil
+	/*
+		block := env.BlockStore.LoadBlockByHash(hash)
+		if block == nil {
+			return &ctypes.ResultBlock{BlockID: types.BlockID{}, Block: nil}, nil
+		}
+		// If block is not nil, then blockMeta can't be nil.
+		blockMeta := env.BlockStore.LoadBlockMeta(block.Height)
+		return &ctypes.ResultBlock{BlockID: blockMeta.BlockID, Block: block}, nil
+	*/
+	return &ctypes.ResultBlock{BlockID: types.BlockID{}, Block: nil}, nil
 }
 
 // Commit gets block commit at a given height.
@@ -147,8 +151,8 @@ func BlockResults(ctx *rpctypes.Context, heightPtr *int64) (*ctypes.ResultBlockR
 	}
 
 	return &ctypes.ResultBlockResults{
-		Height:                height,
-		TxsResults:            results.DeliverTxs,
+		Height: height,
+		//TxsResults:            results.DeliverTxs,
 		BeginBlockEvents:      results.BeginBlock.Events,
 		EndBlockEvents:        results.EndBlock.Events,
 		ValidatorUpdates:      results.EndBlock.ValidatorUpdates,
